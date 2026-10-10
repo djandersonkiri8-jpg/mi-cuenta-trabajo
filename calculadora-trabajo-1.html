@@ -1,0 +1,183 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f3a5f"><link rel="icon" type="image/png" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Mi Cuenta">
+<title>MI CUENTA DE TRABAJO</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font:16px system-ui,sans-serif;background:#f2f4f7;color:#1b2430;padding-bottom:170px}
+header{background:#1f3a5f;color:#fff;padding:12px 14px}h1{margin:0;font-size:20px}#dt{font-size:13px;opacity:.85;margin:2px 0 8px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:13px 10px;background:#1f3a5f;color:#fff;min-height:48px}
+button.g{background:#dfe4ea;color:#1b2430}button.r{background:#b3261e}button.s{padding:8px 12px;min-height:40px;flex:none}
+header button{background:#fff;color:#1f3a5f}
+input,select,textarea{font:inherit;width:100%;padding:12px;border:1px solid #b8c0cc;border-radius:10px;background:#fff;margin:4px 0}
+.v{padding:12px;display:none}.v.on{display:block}h2{font-size:17px;margin:16px 0 6px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:6px 0}.chips button{flex:none;padding:8px 12px;min-height:38px;background:#dfe4ea;color:#1b2430}.chips button.on{background:#1f3a5f;color:#fff}
+.it{display:flex;align-items:center;gap:8px;background:#fff;border-radius:10px;padding:10px;margin:6px 0;box-shadow:0 1px 2px #0002}
+.it .n{flex:1;font-weight:600}.it .p{font-weight:700;color:#1f3a5f}.w{color:#b3261e;font-size:13px;font-weight:700}
+.ln{background:#fff;border-radius:10px;padding:10px;margin:6px 0;box-shadow:0 1px 2px #0002}.ln .t{display:flex;justify-content:space-between;font-weight:700}
+.st{display:flex;gap:8px}.st div{flex:1;background:#fff;border-radius:10px;padding:8px;text-align:center;font-size:13px}.st b{display:block;font-size:18px}
+#bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:3px solid #1f3a5f;padding:10px 12px;box-shadow:0 -3px 10px #0003}
+#bar .tot{display:flex;justify-content:space-between;align-items:center;font-size:14px;margin-bottom:8px}#bar .tot b{font-size:28px;color:#1f3a5f}
+#dg{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:14px;z-index:9}
+.bx{background:#fff;border-radius:14px;padding:16px;width:100%;max-width:420px;max-height:90vh;overflow:auto}.bx>.row{margin-top:10px}
+#ts{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#1b2430;color:#fff;padding:10px 16px;border-radius:20px;display:none;z-index:10;font-size:14px}
+canvas{width:100%;border:1px solid #b8c0cc;border-radius:6px}#pp{display:none}
+@media print{body>*:not(#pp){display:none!important}#pp{display:block}#pp img{width:100%}}
+</style></head><body>
+<header><h1>MI CUENTA DE TRABAJO</h1><div id="dt"></div><div class="row"><button onclick="newAcc()">NUEVA CUENTA</button><button onclick="go('h')">HISTORIAL</button><button onclick="go('c')">CONFIGURACIÓN</button></div></header>
+
+<div class="v on" id="v-m">
+<input id="q" placeholder="🔍 Buscar paso…" oninput="rc()"><div class="chips" id="ch"></div><div id="cl"></div>
+<h2>MI TRABAJO</h2><div class="st"><div>Tareas<b id="s1">0</b></div><div>Prendas<b id="s2">0</b></div><div>Importe<b id="s3">$0</b></div></div>
+<div id="ml"></div><div class="row" style="margin-top:8px"><button class="g" onclick="merge()">Consolidar repetidas</button><button class="r" onclick="clearAcc()">Vaciar cuenta</button></div>
+</div>
+
+<div class="v" id="v-h"><button class="g" onclick="go('m')">← Volver</button><h2>HISTORIAL</h2>
+<div class="row"><div>Desde<input type="date" id="hf" onchange="rh()"></div><div>Hasta<input type="date" id="ht" onchange="rh()"></div></div>
+<div class="st"><div>Cuentas<b id="h1">0</b></div><div>Total filtrado<b id="h2">$0</b></div><div>Hoy<b id="h3">$0</b></div></div><div id="hl"></div></div>
+
+<div class="v" id="v-c"><button class="g" onclick="go('m')">← Volver</button><h2>CONFIGURACIÓN</h2>
+Nombre del trabajador<input id="cw" oninput="s.worker=this.value;sv()">
+<p>Cuentas guardadas: <b id="cn">0</b></p>
+<h2>Precios por confirmar</h2><div id="pl"></div>
+<h2>Nueva tarea</h2><input id="nn" placeholder="Nombre del paso"><input id="np" placeholder="Precio COP" inputmode="numeric"><select id="nc"></select><button onclick="addTask()" style="width:100%">CREAR TAREA</button>
+<h2>Copia de seguridad</h2><div class="row"><button onclick="expo()">EXPORTAR JSON</button><button class="g" onclick="$('fi').click()">IMPORTAR JSON</button></div><input type="file" id="fi" accept=".json,application/json" style="display:none" onchange="impo(this)">
+<p style="font-size:13px">Los datos se guardan solo en el navegador de este teléfono; no se sincronizan con otros dispositivos. Haz copias JSON con frecuencia.</p>
+<button class="r" style="width:100%" onclick="delHist()">BORRAR TODO EL HISTORIAL</button></div>
+
+<div class="v" id="v-r"><button class="g" onclick="go('m')">← VOLVER A EDITAR</button><h2>RECIBO</h2>
+Trabajador<input id="rw" oninput="s.worker=this.value;sv();draw()">Observaciones<textarea id="ro" rows="2" oninput="R.obs=this.value;draw()"></textarea>
+<canvas id="cv"></canvas><div class="row" style="margin-top:8px"><button onclick="png()">GUARDAR COMO IMAGEN PNG</button><button onclick="shr()">COMPARTIR RECIBO</button></div>
+<div class="row" style="margin-top:8px"><button class="g" onclick="prn()">IMPRIMIR RECIBO</button><button id="rs" onclick="saveAcc()">GUARDAR EN HISTORIAL</button></div></div>
+
+<div id="bar"><div class="tot"><span>TOTAL A COBRAR</span><b id="tt">$0</b></div><div class="row"><button class="g" onclick="saveAcc()">GUARDAR CUENTA</button><button onclick="genR()">GENERAR RECIBO</button></div></div>
+<div id="dg"></div><div id="ts"></div><div id="pp"></div>
+
+<script>
+const $=i=>document.getElementById(i),K='mct1',CATS=['Bolsi','Cierre y tiro','Dobladillo','Encuadrilar','Entrepierna','Costura y piezas','Caucho','Sesgo','Otros'];
+const RAW=`BOLSI COMPLE H|457
+BOLSI COMPLE N|408
+BOLSI FILETE H|91
+BOLSI FILETE N|75
+BOLSI TRASERO H|378
+CERRAR TIRO D|110
+CERRAR TIRO H|126
+CERRAR TIRO N|110
+DOBLADILLO BOLSI H|38
+DOBLADILLO BOLSI CAMUFLADO|78
+DOBLADILLO D|162
+DOBLADILLO H|170
+DOBLADILLO N|148
+BOLSI CAMUFLADO|1569
+ENCUADRILAR D|131
+ENCUADRILAR H|196
+ENCUADRILAR N|146
+ENCUADRILAR NIÑA|114
+ENCUADRILADA SUDADERA|393
+ENTREPIERNA D|61
+ENTREPIERNA H|82
+ENTREPIERNA N|61
+ENTREPIERNA NIÑA|61
+ENTREPIERNA SUDADERA|151
+PISE COST D|111
+PISE COST H|138
+PISE COST N|111
+PISE COST NIÑA|96
+PISE COST SUDADERA|239
+PISE PIEZAS DEL H|124
+PISE PIEZAS DEL N|111
+PISE SESGO D|135
+SESGO LATERAL|392
+FILETE PIEZAS DEL H|146
+FILETE PIEZAS DEL N|131
+PEGUE CAUCHO CH|135
+PEGUE CAUCHO D|121
+PEGUE CAUCHO H|135
+PEGUE CAUCHO N|121
+PEGUE CAUCHO NIÑA|118
+PISE CAUCHO D|136
+PISE CAUCHO H|136
+PISE CAUCHO N|131
+PISE CAUCHO NIÑA|131
+PISE CAUCHO SUDADERA|143
+PISE TIRO D|101
+PISE TIRO H|101
+PISE TIRO N|87
+PISE TIRO NIÑA|87
+REMATE SESGO D|453
+CORDON|90
+HOJAL|105
+DESPELUCE|125`;
+let s,R=null,F='Todas',uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const fm=n=>'$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.'),e=t=>String(t).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';'),pq=v=>/^\d+$/.test(String(v).trim())&&+v>0&&+v<=1e7?+v:0,
+nz=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function catOf(n){const t=[['DOBLADILLO','Dobladillo'],['BOLSI','Bolsi'],['TIRO','Cierre y tiro'],['ENCUADRIL','Encuadrilar'],['ENTREPIERNA','Entrepierna'],['CAUCHO','Caucho'],['SESGO','Sesgo'],['PISE','Costura y piezas'],['FILETE','Costura y piezas']];for(const[k,c]of t)if(n.includes(k))return c;return'Otros'}
+function init(){try{s=JSON.parse(localStorage.getItem(K))}catch(x){}
+if(!s||!Array.isArray(s.cat)){s={cat:RAW.split('\n').map(l=>{const[a,b]=l.split('|');return{id:uid(),n:a,p:+b,c:catOf(a),pend:a=='DESPELUCE'?1:0}}),worker:'',seq:0,hist:[],cur:[]};sv()}}
+function sv(){try{localStorage.setItem(K,JSON.stringify(s));return 1}catch(x){alert('⚠ No se pudo guardar en el navegador. Tus cambios NO están guardados.');return 0}}
+function toast(t){const d=$('ts');d.textContent=t;d.style.display='block';clearTimeout(d.t);d.t=setTimeout(()=>d.style.display='none',2200)}
+function dlg(h,ok,lbl){$('dg').innerHTML='<div class="bx">'+h+'<div class="row"><button class="g" onclick="cl()">Cancelar</button>'+(ok?'<button id="ok">'+(lbl||'Aceptar')+'</button>':'')+'</div></div>';$('dg').style.display='flex';if(ok)$('ok').onclick=()=>{if(ok()!==false)cl()}}
+function cl(){$('dg').style.display='none'}
+function go(v){['m','h','c','r'].forEach(x=>$('v-'+x).classList.toggle('on',x==v));$('bar').style.display=v=='r'||v=='m'?'block':'none';if(v=='h')rh();if(v=='c')rcf();window.scrollTo(0,0)}
+function tot(l){return l.reduce((a,x)=>a+x.p*x.q,0)}function un(l){return l.reduce((a,x)=>a+x.q,0)}
+function rc(){const q=nz($('q').value);$('ch').innerHTML=['Todas',...CATS].map(c=>`<button class="${c==F?'on':''}" onclick="F='${c}';rc()">${c}</button>`).join('');
+const L=s.cat.filter(i=>(F=='Todas'||i.c==F)&&nz(i.n).includes(q)).sort((a,b)=>a.n.localeCompare(b.n,'es'));
+$('cl').innerHTML=L.map(i=>`<div class="it"><div class="n" onclick="addDlg('${i.id}')">${e(i.n)}${i.pend?'<div class="w">⚠ Precio por confirmar</div>':''}</div><span class="p">${fm(i.p)}</span><button class="s" onclick="addDlg('${i.id}')">＋</button><button class="s g" onclick="edDlg('${i.id}')">✎</button></div>`).join('')||'<p>Sin resultados.</p><button class="g" onclick="go(\'c\')">Crear tarea nueva</button>'}
+function rm(){$('ml').innerHTML=s.cur.map(l=>`<div class="ln"><div class="t"><span>${e(l.n)}</span><span>${fm(l.p*l.q)}</span></div><div>${fm(l.p)} × ${l.q}${l.pend?' <span class="w">⚠ precio por confirmar</span>':''}</div><div class="row" style="margin-top:6px"><button class="s g" onclick="qDlg('${l.id}')">Cambiar cantidad</button><button class="s r" onclick="delL('${l.id}')">Eliminar</button></div></div>`).join('')||'<p>Aún no has agregado pasos.</p>';
+$('s1').textContent=new Set(s.cur.map(l=>l.n)).size;$('s2').textContent=un(s.cur);$('s3').textContent=$('tt').textContent=fm(tot(s.cur))}
+function qHtml(t,v,x){return `<h3>${e(t)}</h3>${x||''}<div class="row"><button class="g" onclick="st(-1)">−</button><input id="qi" inputmode="numeric" value="${v}" style="text-align:center;font-size:22px"><button class="g" onclick="st(1)">+</button></div>`}
+function st(d){const i=$('qi');i.value=Math.max(1,(pq(i.value)||0)+d)}
+function addDlg(id){const it=s.cat.find(x=>x.id==id);dlg(qHtml(it.n,1,`<p>Precio: <b>${fm(it.p)}</b></p>`+(it.pend?'<p class="w">⚠ Precio por confirmar. No podrás guardar la cuenta ni generar el recibo hasta confirmarlo en Configuración.</p>':'')),()=>{const q=pq($('qi').value);if(!q){alert('Escribe una cantidad entera mayor que 0.');return false}
+const ex=s.cur.find(l=>l.n==it.n);if(ex&&confirm('Ya tienes "'+it.n+'" en la cuenta.\nAceptar = sumar a esa línea.\nCancelar = crear una línea separada.'))ex.q+=q;else s.cur.push({id:uid(),n:it.n,p:it.p,q,pend:it.pend});sv();rm();toast('Agregado')},'Confirmar')}
+function qDlg(id){const l=s.cur.find(x=>x.id==id);dlg(qHtml(l.n,l.q),()=>{const q=pq($('qi').value);if(!q){alert('Cantidad inválida.');return false}l.q=q;sv();rm()},'Guardar')}
+function delL(id){if(confirm('¿Eliminar esta línea?')){s.cur=s.cur.filter(l=>l.id!=id);sv();rm()}}
+function merge(){const m={};s.cur.forEach(l=>{if(m[l.n])m[l.n].q+=l.q;else m[l.n]={...l}});const n=Object.values(m);if(n.length==s.cur.length)return toast('No hay repetidas');if(confirm('¿Sumar las líneas repetidas en una sola?')){s.cur=n;sv();rm()}}
+function clearAcc(){if(s.cur.length&&confirm('¿Vaciar la cuenta actual?')){s.cur=[];sv();rm()}}
+function newAcc(){if(!s.cur.length||confirm('Se vaciará la cuenta actual sin guardar. ¿Continuar?')){s.cur=[];sv();rm();go('m')}}
+function edDlg(id){const i=s.cat.find(x=>x.id==id);dlg(`<h3>${e(i.n)}</h3><p style="font-size:13px">El cambio solo afecta cuentas nuevas.</p>Precio COP<input id="ep" inputmode="numeric" value="${i.p}">${i.pend?'<p class="w">Precio por confirmar: confírmalo en Configuración.</p>':''}<button class="r" style="width:100%" onclick="delT('${id}')">Eliminar tarea</button>`,()=>{const p=pq($('ep').value);if(!p){alert('Precio inválido.');return false}i.p=p;sv();rc()},'Guardar')}
+function delT(id){const i=s.cat.find(x=>x.id==id);if(confirm('¿Eliminar "'+i.n+'" del catálogo? Las cuentas guardadas no cambian.')){s.cat=s.cat.filter(x=>x.id!=id);sv();cl();rc()}}
+function addTask(){const n=$('nn').value.trim().toUpperCase(),p=pq($('np').value);if(!n||!p)return alert('Escribe un nombre y un precio entero mayor que 0.');if(s.cat.some(x=>x.n==n))return alert('Esa tarea ya existe.');s.cat.push({id:uid(),n,p,c:$('nc').value,pend:0});if(sv()){$('nn').value=$('np').value='';toast('Tarea creada');rc()}}
+function rcf(){$('cw').value=s.worker||'';$('cn').textContent=s.hist.length;$('nc').innerHTML=CATS.map(c=>`<option>${c}</option>`).join('');const P=s.cat.filter(i=>i.pend);
+$('pl').innerHTML=P.map(i=>`<div class="ln"><b>${e(i.n)}</b><input id="pp_${i.id}" inputmode="numeric" value="${i.p}"><button style="width:100%" onclick="conf('${i.id}')">CONFIRMAR PRECIO</button></div>`).join('')||'<p>No hay precios pendientes.</p>'}
+function conf(id){const p=pq($('pp_'+id).value);if(!p)return alert('Precio inválido.');const i=s.cat.find(x=>x.id==id);i.p=p;i.pend=0;if(sv()){toast('Precio confirmado');rcf();rc()}}
+function chk(){if(!s.cur.length){alert('Agrega al menos un paso.');return 0}for(const l of s.cur){if(l.pend){const i=s.cat.find(x=>x.n==l.n);if(i&&!i.pend){l.p=i.p;l.pend=0}else{alert('Confirma el precio de "'+l.n+'" en Configuración antes de continuar.');return 0}}}sv();return 1}
+function genR(){if(!chk())return;R={no:s.seq+1,ts:Date.now(),obs:R&&!R.saved?R.obs||'':'',lines:s.cur.map(l=>({...l})),saved:0};showR()}
+function showR(){$('rw').value=s.worker||'';$('ro').value=R.obs||'';$('rs').disabled=!!R.saved;$('rs').textContent=R.saved?'YA GUARDADO EN HISTORIAL':'GUARDAR EN HISTORIAL';go('r');draw()}
+function saveAcc(){if(!R||!R.saved){if(!R||$('v-r').classList.contains('on')==false){if(!chk())return;R={no:s.seq+1,ts:Date.now(),obs:'',lines:s.cur.map(l=>({...l})),saved:0}}
+const rec={no:s.seq+1,ts:R.ts,worker:s.worker||'',obs:R.obs||'',lines:R.lines.map(l=>({n:l.n,p:l.p,q:l.q})),total:tot(R.lines),units:un(R.lines)};
+const bs=JSON.stringify(s);s.hist.push(rec);s.seq=rec.no;s.cur=[];if(!sv()){s=JSON.parse(bs);return}R.no=rec.no;R.saved=1;rm();toast('Cuenta guardada en historial');if($('v-r').classList.contains('on'))showR();else{R=null;go('m')}}}
+function wrap(c,t,w){const o=[];t.split('\n').forEach(p=>{let l='';p.split(' ').forEach(x=>{if(c.measureText(l+' '+x).width>w&&l){o.push(l);l=x}else l=l?l+' '+x:x});o.push(l)});return o}
+function draw(){const d=R,cv=$('cv'),W=900,L=d.lines,c=cv.getContext('2d');d.worker=$('rw').value;cv.width=W;cv.height=2000;c.font='24px sans-serif';const ob=d.obs?wrap(c,d.obs,W-80):[];
+const H=330+L.length*54+(ob.length?60+ob.length*32:0)+190;cv.height=H;c.fillStyle='#fff';c.fillRect(0,0,W,H);c.fillStyle='#111';c.textAlign='center';c.font='bold 44px sans-serif';c.fillText('RECIBO DE TRABAJO',W/2,70);
+c.font='26px sans-serif';c.textAlign='left';const dt=new Date(d.ts).toLocaleString('es-CO');c.fillText('Recibo N° '+String(d.no).padStart(4,'0'),40,125);c.fillText(dt,40,160);c.fillText('Trabajador: '+(d.worker||'________________'),40,195);
+let y=225;const ln=()=>{c.fillStyle='#111';c.fillRect(40,y,W-80,2)};ln();y+=38;c.font='bold 22px sans-serif';c.fillText('PASO',40,y);c.textAlign='right';c.fillText('CANT.',570,y);c.fillText('PRECIO',710,y);c.fillText('SUBTOTAL',860,y);y+=14;ln();y+=40;
+L.forEach(l=>{let f=24;c.textAlign='left';do{c.font=f+'px sans-serif';f--}while(c.measureText(l.n).width>440&&f>12);c.fillText(l.n,40,y);c.font='24px sans-serif';c.textAlign='right';c.fillText(String(l.q),570,y);c.fillText(fm(l.p),710,y);c.font='bold 24px sans-serif';c.fillText(fm(l.p*l.q),860,y);y+=54});
+y-=22;c.fillStyle='#999';c.fillRect(40,y,W-80,2);y+=40;c.fillStyle='#111';c.textAlign='left';c.font='26px sans-serif';c.fillText('Total de unidades: '+un(L),40,y);y+=24;c.fillRect(40,y,W-80,3);y+=62;
+c.font='bold 36px sans-serif';c.fillText('TOTAL A COBRAR',40,y);c.textAlign='right';c.font='bold 46px sans-serif';c.fillText(fm(tot(L))+' COP',860,y);y+=40;
+if(ob.length){c.textAlign='left';c.font='bold 24px sans-serif';c.fillText('Observaciones:',40,y+30);c.font='24px sans-serif';ob.forEach((t,i)=>c.fillText(t,40,y+70+i*32))}}
+async function dl(b,n){try{const D=await claude.use('downloads');if(D){await D.save({filename:n,data:b});return}}catch(x){if(x&&x.code=='declined')return}const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),3000)}
+const fn=()=>'recibo-trabajo-'+String(R.no).padStart(4,'0')+'.png';
+function png(){draw();$('cv').toBlob(b=>{dl(b,fn());toast('Imagen PNG descargada')},'image/png')}
+function shr(){draw();$('cv').toBlob(b=>{const f=new File([b],fn(),{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],title:'Recibo de trabajo'}).catch(()=>{});else{dl(b,fn());toast('No se puede compartir aquí; se descargó la imagen')}},'image/png')}
+function prn(){draw();$('pp').innerHTML='<img src="'+$('cv').toDataURL('image/png')+'">';setTimeout(()=>window.print(),200)}
+function rh(){const f=$('hf').value,t=$('ht').value,tk=x=>{const d=new Date(x);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const L=s.hist.filter(r=>(!f||tk(r.ts)>=f)&&(!t||tk(r.ts)<=t)).sort((a,b)=>b.no-a.no);$('h1').textContent=L.length;$('h2').textContent=fm(L.reduce((a,r)=>a+r.total,0));$('h3').textContent=fm(s.hist.filter(r=>tk(r.ts)==tk(Date.now())).reduce((a,r)=>a+r.total,0));
+$('hl').innerHTML=L.map(r=>`<div class="it" onclick="hDlg(${r.no})"><div class="n">N° ${String(r.no).padStart(4,'0')}<div style="font-size:13px;font-weight:400">${new Date(r.ts).toLocaleString('es-CO')}</div></div><span class="p">${fm(r.total)}</span></div>`).join('')||'<p>No hay cuentas en este período.</p>'}
+function hDlg(no){const r=s.hist.find(x=>x.no==no);dlg(`<h3>Recibo N° ${String(no).padStart(4,'0')}</h3><p>${new Date(r.ts).toLocaleString('es-CO')}<br>Trabajador: ${e(r.worker||'—')}</p>`+r.lines.map(l=>`<div>${e(l.n)}: ${fm(l.p)} × ${l.q} = <b>${fm(l.p*l.q)}</b></div>`).join('')+`<p>Unidades: ${r.units}<br><b>Total: ${fm(r.total)}</b></p>${r.obs?'<p>Obs: '+e(r.obs)+'</p>':''}<div class="row"><button onclick="reR(${no})">VER RECIBO</button><button class="r" onclick="delR(${no})">Eliminar</button></div>`)}
+function reR(no){const r=s.hist.find(x=>x.no==no);R={no:r.no,ts:r.ts,obs:r.obs,lines:r.lines.map(l=>({...l})),saved:1};cl();const w=s.worker;s.worker=r.worker;showR();s.worker=w}
+function delR(no){if(confirm('¿Eliminar esta cuenta del historial?')){s.hist=s.hist.filter(x=>x.no!=no);if(sv()){cl();rh()}}}
+function delHist(){if(s.hist.length&&confirm('¿Borrar TODO el historial? Esta acción no se puede deshacer.')){s.hist=[];if(sv()){rcf();toast('Historial borrado')}}}
+function expo(){dl(new Blob([JSON.stringify(s)],{type:'application/json'}),'copia-mi-cuenta-'+new Date().toISOString().slice(0,10)+'.json');toast('Copia exportada')}
+function impo(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!Array.isArray(o.cat)||!Array.isArray(o.hist)||typeof o.seq!='number'||!o.cat.every(x=>x.n&&Number.isInteger(x.p)))throw 0;if(!confirm('Esto reemplazará TODOS los datos actuales. ¿Continuar?'))return;const bs=JSON.stringify(s);s={cat:o.cat,worker:o.worker||'',seq:o.seq,hist:o.hist,cur:Array.isArray(o.cur)?o.cur:[]};if(!sv()){s=JSON.parse(bs);return}toast('Copia importada');rcf();rc();rm()}catch(x){alert('El archivo no es una copia válida.')}i.value=''};r.readAsText(f)}
+init();$('dt').textContent=new Date().toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});rc();rm();
+</script><script>
+if('serviceWorker' in navigator&&location.protocol!=='file:'){
+ addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js').then(reg=>{
+  const ask=w=>{const b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:20;background:#d9822b;color:#fff;padding:10px;display:flex;gap:8px;align-items:center;font-weight:700';
+   b.innerHTML='<span style="flex:1">Hay una versión nueva de la app. Tus datos no se tocan.</span>';const k=document.createElement('button');k.textContent='ACTUALIZAR';k.style.cssText='background:#fff;color:#1f3a5f;min-height:40px';
+   k.onclick=()=>{w.postMessage('SKIP')};b.appendChild(k);document.body.appendChild(b)};
+  if(reg.waiting&&navigator.serviceWorker.controller)ask(reg.waiting);
+  reg.addEventListener('updatefound',()=>{const w=reg.installing;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)ask(w)})});
+  let rl=0;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!rl){rl=1;location.reload()}});
+ }).catch(()=>{}));
+}
+</script>
+</body></html>
