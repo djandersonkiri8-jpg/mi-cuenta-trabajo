@@ -1,5 +1,5 @@
 // Sube este número cada vez que cambies cualquier archivo de la app.
-const VERSION='mct-v1';
+const VERSION='mct-v3';
 const ASSETS=['./calculadora-trabajo.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./apple-touch-icon.png'];
 self.addEventListener('install',e=>{
   // No usa skipWaiting automático: la versión nueva espera a que el usuario acepte actualizar.

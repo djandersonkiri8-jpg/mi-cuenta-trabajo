@@ -22,7 +22,7 @@ input,select,textarea{font:inherit;width:100%;padding:12px;border:1px solid #b8c
 canvas{width:100%;border:1px solid #b8c0cc;border-radius:6px}#pp{display:none}
 @media print{body>*:not(#pp){display:none!important}#pp{display:block}#pp img{width:100%}}
 </style></head><body>
-<header><h1>MI CUENTA DE TRABAJO</h1><div id="dt"></div><div class="row"><button onclick="newAcc()">NUEVA CUENTA</button><button onclick="go('h')">HISTORIAL</button><button onclick="go('c')">CONFIGURACIÓN</button></div></header>
+<header><h1>MI CUENTA DE TRABAJO</h1><div id="dt"></div><div class="row"><button onclick="newAcc()">NUEVA CUENTA</button><button onclick="go('n')">CUADERNO</button><button onclick="go('h')">HISTORIAL</button><button onclick="go('c')">CONFIGURACIÓN</button></div></header>
 
 <div class="v on" id="v-m">
 <input id="q" placeholder="🔍 Buscar paso…" oninput="rc()"><div class="chips" id="ch"></div><div id="cl"></div>
@@ -43,6 +43,17 @@ Nombre del trabajador<input id="cw" oninput="s.worker=this.value;sv()">
 <p style="font-size:13px">Los datos se guardan solo en el navegador de este teléfono; no se sincronizan con otros dispositivos. Haz copias JSON con frecuencia.</p>
 <button class="r" style="width:100%" onclick="delHist()">BORRAR TODO EL HISTORIAL</button></div>
 
+<div class="v" id="v-n"><button class="g" onclick="go('m')">← Volver</button><h2>CUADERNO DE PRODUCCIÓN</h2>
+<div class="row" style="align-items:center"><button class="g s" onclick="qmove(-1)">◀</button><b id="ql" style="flex:3;text-align:center"></b><button class="g s" onclick="qmove(1)">▶</button></div>
+<select id="qs" onchange="qgo(this.value)"></select><button style="width:100%;margin-top:6px" onclick="nbDlg()">+ Agregar registro</button>
+<p style="font-size:12px">Lista acumulativa de la quincena. Registra producción en prendas; no calcula dinero y es independiente de las cuentas de pago.</p>
+<input id="nq" placeholder="🔍 Buscar referencia, tarea, prenda, talla, fecha u observación" oninput="rn()"><input id="nr2" placeholder="Filtrar por referencia" oninput="rn()">
+<div class="row"><div>Desde<input type="date" id="nf" onchange="rn()"></div><div>Hasta<input type="date" id="nt" onchange="rn()"></div></div>
+<label><input type="checkbox" id="na" onchange="rn()" style="width:auto"> Buscar en todas las quincenas</label>
+<div class="st"><div>Prendas<b id="n1">0</b></div><div>Registros<b id="n2">0</b></div></div>
+<p style="font-size:12px">Los totales suman cantidades registradas; una misma prenda puede aparecer en varias tareas.</p>
+<div id="ns"></div><h2>Exportar</h2><select id="nx"><option value="f">Solo resultados filtrados</option><option value="q">Toda la quincena</option></select>
+<div class="row"><button class="g" onclick="nbExp('csv')">CSV</button><button class="g" onclick="nbExp('json')">JSON</button></div><h2>Registros</h2><div id="nl"></div></div>
 <div class="v" id="v-r"><button class="g" onclick="go('m')">← VOLVER A EDITAR</button><h2>RECIBO</h2>
 Trabajador<input id="rw" oninput="s.worker=this.value;sv();draw()">Observaciones<textarea id="ro" rows="2" oninput="R.obs=this.value;draw()"></textarea>
 <canvas id="cv"></canvas><div class="row" style="margin-top:8px"><button onclick="png()">GUARDAR COMO IMAGEN PNG</button><button onclick="shr()">COMPARTIR RECIBO</button></div>
@@ -111,12 +122,12 @@ const fm=n=>'$'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.'),e=t=>String(t).re
 nz=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 function catOf(n){const t=[['DOBLADILLO','Dobladillo'],['BOLSI','Bolsi'],['TIRO','Cierre y tiro'],['ENCUADRIL','Encuadrilar'],['ENTREPIERNA','Entrepierna'],['CAUCHO','Caucho'],['SESGO','Sesgo'],['PISE','Costura y piezas'],['FILETE','Costura y piezas']];for(const[k,c]of t)if(n.includes(k))return c;return'Otros'}
 function init(){try{s=JSON.parse(localStorage.getItem(K))}catch(x){}
-if(!s||!Array.isArray(s.cat)){s={cat:RAW.split('\n').map(l=>{const[a,b]=l.split('|');return{id:uid(),n:a,p:+b,c:catOf(a),pend:a=='DESPELUCE'?1:0}}),worker:'',seq:0,hist:[],cur:[]};sv()}}
+if(!s||!Array.isArray(s.cat)){s={cat:RAW.split('\n').map(l=>{const[a,b]=l.split('|');return{id:uid(),n:a,p:+b,c:catOf(a),pend:a=='DESPELUCE'?1:0}}),worker:'',seq:0,hist:[],cur:[]};sv()}s.nb=Array.isArray(s.nb)?s.nb:[];s.pr=Array.isArray(s.pr)?s.pr:['Pantaloneta unicolor hombre','Pantaloneta unicolor niños','Pantaloneta unicolor damas','Pantaloneta de tres colores hombre','Pantaloneta de tres colores niños','Pantaloneta de dos colores hombre','Pantaloneta de dos colores niños','Pantaloneta microperforada','Pantaloneta licrada','Pantaloneta camuflada hombre','Sudadera hombre']}
 function sv(){try{localStorage.setItem(K,JSON.stringify(s));return 1}catch(x){alert('⚠ No se pudo guardar en el navegador. Tus cambios NO están guardados.');return 0}}
 function toast(t){const d=$('ts');d.textContent=t;d.style.display='block';clearTimeout(d.t);d.t=setTimeout(()=>d.style.display='none',2200)}
 function dlg(h,ok,lbl){$('dg').innerHTML='<div class="bx">'+h+'<div class="row"><button class="g" onclick="cl()">Cancelar</button>'+(ok?'<button id="ok">'+(lbl||'Aceptar')+'</button>':'')+'</div></div>';$('dg').style.display='flex';if(ok)$('ok').onclick=()=>{if(ok()!==false)cl()}}
 function cl(){$('dg').style.display='none'}
-function go(v){['m','h','c','r'].forEach(x=>$('v-'+x).classList.toggle('on',x==v));$('bar').style.display=v=='r'||v=='m'?'block':'none';if(v=='h')rh();if(v=='c')rcf();window.scrollTo(0,0)}
+function go(v){['m','h','c','r','n'].forEach(x=>$('v-'+x).classList.toggle('on',x==v));$('bar').style.display=v=='r'||v=='m'?'block':'none';if(v=='h')rh();if(v=='n')rn();if(v=='c')rcf();window.scrollTo(0,0)}
 function tot(l){return l.reduce((a,x)=>a+x.p*x.q,0)}function un(l){return l.reduce((a,x)=>a+x.q,0)}
 function rc(){const q=nz($('q').value);$('ch').innerHTML=['Todas',...CATS].map(c=>`<button class="${c==F?'on':''}" onclick="F='${c}';rc()">${c}</button>`).join('');
 const L=s.cat.filter(i=>(F=='Todas'||i.c==F)&&nz(i.n).includes(q)).sort((a,b)=>a.n.localeCompare(b.n,'es'));
@@ -126,7 +137,7 @@ $('s1').textContent=new Set(s.cur.map(l=>l.n)).size;$('s2').textContent=un(s.cur
 function qHtml(t,v,x){return `<h3>${e(t)}</h3>${x||''}<div class="row"><button class="g" onclick="st(-1)">−</button><input id="qi" inputmode="numeric" value="${v}" style="text-align:center;font-size:22px"><button class="g" onclick="st(1)">+</button></div>`}
 function st(d){const i=$('qi');i.value=Math.max(1,(pq(i.value)||0)+d)}
 function addDlg(id){const it=s.cat.find(x=>x.id==id);dlg(qHtml(it.n,1,`<p>Precio: <b>${fm(it.p)}</b></p>`+(it.pend?'<p class="w">⚠ Precio por confirmar. No podrás guardar la cuenta ni generar el recibo hasta confirmarlo en Configuración.</p>':'')),()=>{const q=pq($('qi').value);if(!q){alert('Escribe una cantidad entera mayor que 0.');return false}
-const ex=s.cur.find(l=>l.n==it.n);if(ex&&confirm('Ya tienes "'+it.n+'" en la cuenta.\nAceptar = sumar a esa línea.\nCancelar = crear una línea separada.'))ex.q+=q;else s.cur.push({id:uid(),n:it.n,p:it.p,q,pend:it.pend});sv();rm();toast('Agregado')},'Confirmar')}
+s.cur.push({id:uid(),n:it.n,p:it.p,q,pend:it.pend});sv();rm();toast('Agregado')},'Confirmar')}
 function qDlg(id){const l=s.cur.find(x=>x.id==id);dlg(qHtml(l.n,l.q),()=>{const q=pq($('qi').value);if(!q){alert('Cantidad inválida.');return false}l.q=q;sv();rm()},'Guardar')}
 function delL(id){if(confirm('¿Eliminar esta línea?')){s.cur=s.cur.filter(l=>l.id!=id);sv();rm()}}
 function merge(){const m={};s.cur.forEach(l=>{if(m[l.n])m[l.n].q+=l.q;else m[l.n]={...l}});const n=Object.values(m);if(n.length==s.cur.length)return toast('No hay repetidas');if(confirm('¿Sumar las líneas repetidas en una sola?')){s.cur=n;sv();rm()}}
@@ -166,9 +177,38 @@ function reR(no){const r=s.hist.find(x=>x.no==no);R={no:r.no,ts:r.ts,obs:r.obs,l
 function delR(no){if(confirm('¿Eliminar esta cuenta del historial?')){s.hist=s.hist.filter(x=>x.no!=no);if(sv()){cl();rh()}}}
 function delHist(){if(s.hist.length&&confirm('¿Borrar TODO el historial? Esta acción no se puede deshacer.')){s.hist=[];if(sv()){rcf();toast('Historial borrado')}}}
 function expo(){dl(new Blob([JSON.stringify(s)],{type:'application/json'}),'copia-mi-cuenta-'+new Date().toISOString().slice(0,10)+'.json');toast('Copia exportada')}
-function impo(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!Array.isArray(o.cat)||!Array.isArray(o.hist)||typeof o.seq!='number'||!o.cat.every(x=>x.n&&Number.isInteger(x.p)))throw 0;if(!confirm('Esto reemplazará TODOS los datos actuales. ¿Continuar?'))return;const bs=JSON.stringify(s);s={cat:o.cat,worker:o.worker||'',seq:o.seq,hist:o.hist,cur:Array.isArray(o.cur)?o.cur:[]};if(!sv()){s=JSON.parse(bs);return}toast('Copia importada');rcf();rc();rm()}catch(x){alert('El archivo no es una copia válida.')}i.value=''};r.readAsText(f)}
+function impo(i){const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!Array.isArray(o.cat)||!Array.isArray(o.hist)||typeof o.seq!='number'||!o.cat.every(x=>x.n&&Number.isInteger(x.p)))throw 0;if(!confirm('Esto reemplazará TODOS los datos actuales. ¿Continuar?'))return;const bs=JSON.stringify(s);s={cat:o.cat,worker:o.worker||'',seq:o.seq,hist:o.hist,cur:Array.isArray(o.cur)?o.cur:[],nb:Array.isArray(o.nb)?o.nb:[],pr:Array.isArray(o.pr)?o.pr:s.pr};if(!sv()){s=JSON.parse(bs);return}toast('Copia importada');rcf();rc();rm()}catch(x){alert('El archivo no es una copia válida.')}i.value=''};r.readAsText(f)}
 init();$('dt').textContent=new Date().toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long',year:'numeric'});rc();rm();
 </script><script>
+const TL=['XS','S','M','L','XL','XXL'],MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+let NE=null,Q=null;const ymd=d=>{d=new Date(d);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const p2=n=>String(n).padStart(2,'0'),qk=f=>{const[y,m,d]=f.split('-').map(Number);return{y,m,h:d<=15?1:2}},qid=q=>q.y+'-'+p2(q.m)+'-'+q.h,
+qlab=q=>(q.h==1?'1 al 15':'16 al '+new Date(q.y,q.m,0).getDate())+' de '+MES[q.m-1]+' de '+q.y,
+qrange=q=>[q.y+'-'+p2(q.m)+(q.h==1?'-01':'-16'),q.y+'-'+p2(q.m)+(q.h==1?'-15':'-'+p2(new Date(q.y,q.m,0).getDate()))];
+function qmove(d){Q={...Q};if(d>0){if(Q.h==1)Q.h=2;else{Q.h=1;if(++Q.m>12){Q.m=1;Q.y++}}}else{if(Q.h==2)Q.h=1;else{Q.h=2;if(--Q.m<1){Q.m=12;Q.y--}}}rn()}
+function qgo(v){const[y,m,h]=v.split('-').map(Number);Q={y,m,h};rn()}
+function nbF(all){const q=nz($('nq').value),rf=nz($('nr2').value.trim()),f=$('nf').value,t=$('nt').value,ws=$('na').checked&&!all;
+return s.nb.filter(r=>(ws||qid(qk(r.fecha))==qid(Q))&&(all||((!f||r.fecha>=f)&&(!t||r.fecha<=t)&&(!rf||nz(r.ref).includes(rf))&&(!q||nz([r.ref,r.tarea,r.prenda,r.talla,r.fecha,r.obs||''].join(' ')).includes(q))))).sort((x,y)=>x.fecha.localeCompare(y.fecha))}
+function grp(L,k){const o={};L.forEach(r=>o[r[k]]=(o[r[k]]||0)+r.cant);return Object.entries(o).sort((a,b)=>a[0].localeCompare(b[0],'es',{numeric:true}))}
+function rn(){if(!Q)Q=qk(ymd(Date.now()));$('ql').textContent=qlab(Q);const ids=[...new Set([...s.nb.map(r=>qid(qk(r.fecha))),qid(Q)])].sort().reverse();
+$('qs').innerHTML=ids.map(i=>{const[y,m,h]=i.split('-').map(Number);return'<option value="'+i+'"'+(i==qid(Q)?' selected':'')+'>'+qlab({y,m,h})+' ('+s.nb.filter(r=>qid(qk(r.fecha))==i).length+')</option>'}).join('');
+const L=nbF();$('n1').textContent=L.reduce((a,r)=>a+r.cant,0);$('n2').textContent=L.length;
+$('ns').innerHTML=[['Por referencia','ref'],['Por tarea','tarea'],['Por prenda','prenda'],['Por talla','talla'],['Por fecha','fecha']].map(([h,k])=>'<div class="ln"><b>'+h+'</b>'+grp(L,k).map(([a,b])=>'<div style="display:flex;justify-content:space-between"><span>'+e(a)+'</span><b>'+b+'</b></div>').join('')+'</div>').join('');
+$('nl').innerHTML=L.map(r=>`<div class="ln"><div class="t"><span>${r.fecha.split('-').reverse().join('/')} · <u onclick="$('nr2').value=this.textContent;rn()">${e(r.ref)}</u></span><span>${r.cant}</span></div><div><b>${e(r.tarea)}</b><br>${e(r.prenda)} · Talla ${e(r.talla)}${r.obs?'<br>Obs: '+e(r.obs):''}</div><div class="row" style="margin-top:6px"><button class="s g" onclick="nbDlg('${r.id}')">Editar</button><button class="s r" onclick="nbDel('${r.id}')">Eliminar</button></div></div>`).join('')||'<p>No hay registros en esta lista.</p>'}
+function nbDlg(id){const r=id?s.nb.find(x=>x.id==id):null,[a,b]=qrange(Q),td=ymd(Date.now()),v=(k,d)=>e(r?r[k]??'':d);
+dlg(`<h3>${r?'Editar registro':'Nuevo registro'}</h3>Fecha<input type="date" id="nd" value="${r?r.fecha:(td>=a&&td<=b?td:a)}">Referencia (texto libre)<input id="nr" value="${v('ref','')}" autocomplete="off">Tarea realizada (del catálogo)<input id="ntk" list="dk" value="${v('tarea','')}" autocomplete="off"><datalist id="dk">${s.cat.slice().sort((x,y)=>x.n.localeCompare(y.n,'es')).map(i=>'<option value="'+e(i.n)+'">').join('')}</datalist>Prenda<input id="np2" list="dp" value="${v('prenda','')}" autocomplete="off"><datalist id="dp">${s.pr.map(x=>'<option value="'+e(x)+'">').join('')}</datalist>Talla<input id="ntl" list="dt" value="${v('talla','')}" autocomplete="off"><datalist id="dt">${TL.map(x=>'<option value="'+x+'">').join('')}</datalist>Cantidad de prendas<input id="nc2" inputmode="numeric" value="${v('cant','')}">Observaciones<input id="no" value="${v('obs','')}">`,()=>nbSave(r),r?'Guardar cambios':'Guardar y seguir')}
+function nbSave(o){const r={id:o?o.id:uid(),fecha:$('nd').value,ref:$('nr').value.trim(),tarea:$('ntk').value.trim(),prenda:$('np2').value.trim(),talla:$('ntl').value.trim().toUpperCase(),cant:pq($('nc2').value),obs:$('no').value.trim()};
+const al=m=>{alert(m);return false};
+if(!/^\d{4}-\d{2}-\d{2}$/.test(r.fecha)||isNaN(new Date(r.fecha)))return al('Fecha inválida.');if(!r.ref)return al('Escribe la referencia.');
+if(!s.cat.some(i=>i.n==r.tarea)&&!(o&&o.tarea==r.tarea))return al('Elige una tarea del catálogo.');if(!r.prenda)return al('Escribe o elige la prenda.');if(!r.talla)return al('Escribe o elige la talla.');if(!r.cant)return al('La cantidad debe ser un entero mayor que 0.');
+const bs=JSON.stringify(s);if(o)s.nb[s.nb.findIndex(x=>x.id==o.id)]=r;else s.nb.push(r);if(!s.pr.some(x=>x.toLowerCase()==r.prenda.toLowerCase()))s.pr.push(r.prenda);
+if(!sv()){s=JSON.parse(bs);return false}Q=qk(r.fecha);rn();toast('Registro guardado');if(!o){$('nc2').value='';$('no').value='';$('nc2').focus();return false}}
+function nbDel(id){if(confirm('¿Eliminar este registro?')){s.nb=s.nb.filter(x=>x.id!=id);if(sv())rn()}}
+function nbExp(f){const L=nbF($('nx').value=='q'),n=qid(Q);if(!L.length)return alert('No hay registros para exportar.');
+if(f=='json')return dl(new Blob([JSON.stringify(L.map(r=>({...r,quincena:qid(qk(r.fecha))})),null,1)],{type:'application/json'}),'cuaderno-'+n+'.json');
+const q=v=>'"'+String(v).replace(/"/g,'""')+'"';dl(new Blob(['\ufeff'+'id,fecha,quincena,referencia,tarea,prenda,talla,cantidad,observaciones\n'+L.map(r=>[r.id,r.fecha,qid(qk(r.fecha)),q(r.ref),q(r.tarea),q(r.prenda),q(r.talla),r.cant,q(r.obs||'')].join(',')).join('\n')],{type:'text/csv'}),'cuaderno-'+n+'.csv')}
+</script>
+<script>
 if('serviceWorker' in navigator&&location.protocol!=='file:'){
  addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js').then(reg=>{
   const ask=w=>{const b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:20;background:#d9822b;color:#fff;padding:10px;display:flex;gap:8px;align-items:center;font-weight:700';
